@@ -1,8 +1,9 @@
 (require 'cl)
 (require 'nbt-data)
 
-(cl-defstruct nbt-raw-compound
-  name)
+(cl-defstruct nbt-string name value)
+(cl-defstruct nbt-start-compound name)
+(cl-defstruct nbt-end-compound)
 
 (defun nbt/read--string ()
   (let* ((string-length (nbt/read-short))
@@ -10,12 +11,19 @@
     (goto-char (+ string-length (point)))
     string-content))
 
-(defun nbt/read--raw-compound ()
-  (make-nbt-raw-compound :name (nbt/read--string)))
+(defun nbt/read--string-tag ()
+  (make-nbt-string :name (nbt/read--string)
+                   :value (nbt/read--string)))
+
+(defun nbt/read--end-compound-tag ()
+  (make-nbt-end-compound))
+
+(defun nbt/read--start-compound-tag ()
+  (make-nbt-start-compound :name (nbt/read--string)))
 
 (defun nbt/read-raw-tag ()
   (case (nbt/read-byte)
-    ((list 0) "TAG_End")
+    ((list 0) (nbt/read--end-compound-tag))
     ((list 1) "TAG_Byte")
     ((list 2) "TAG_Short")
     ((list 3) "TAG_Int")
@@ -23,10 +31,16 @@
     ((list 5) "TAG_Float")
     ((list 6) "TAG_Double")
     ((list 7) "TAG_Byte_Array")
-    ((list 8) "TAG_String")
+    ((list 8) (nbt/read--string-tag))
     ((list 9) "TAG_List")
-    ((list 10) (nbt/read--raw-compound))
+    ((list 10) (nbt/read--start-compound-tag))
     ((list 11) "TAG_Int_Array")
     ((list 12) "TAG_Long_Array")))
+
+(defun nbt/read-all-raw-tags ()
+  (let ((tags))
+    (while (/= (point) (point-max))
+      (setq tags (cons (nbt/read-raw-tag) tags)))
+    (nreverse tags)))
 
 (provide 'nbt-tags)
