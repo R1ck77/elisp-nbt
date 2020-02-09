@@ -1,9 +1,11 @@
 (require 'buttercup)
+(require 'nbt-test-utils)
 (require 'nbt-tags)
 (require 'nbt)
 
+
 (describe "nbt"
-  (describe "nbt-read-uncompressed-file"
+  (xdescribe "nbt/read-uncompressed-file"
     (it "can read the basic test"
       (let ((expected-result (make-nbt-compound :name "hello world"
                                                 :items (list (make-nbt-string :name "name"
