@@ -4,8 +4,18 @@
 
 (cl-defstruct nbt-compound name items)
 
-(defun nbt/reduce-tags (raw-tags)
+;;; sketched only
+(defun nbt/read-tags-list (raw-tags)
+  (let ((result))
+    (cond
+     ((nbt-start-compound-p tag) (make-compound-tag (nbt/read-tags-list remaining-tags)))
+     ((nbt-end-compound-p tag) exit-this-read-cycle)
+     (t (setq result (cons result tag))))
+    
+    )
+  ;; read list
   
+  ;; treat everything but compound and begin like a list elment
   )
 
 
