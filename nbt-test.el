@@ -3,7 +3,6 @@
 (require 'nbt-tags)
 (require 'nbt)
 
-
 (describe "nbt"
   (describe "nbt/read-uncompressed-file"
     (it "can read the basic test"
@@ -11,4 +10,7 @@
                                                 :items (list (make-nbt-string :name "name"
                                                                               :value "Bananrama")))))
         (expect (nbt/read-uncompressed-file "test-data/hello_world.nbt")
-                :to-equal expected-result)))))
+                :to-equal expected-result)))
+    (it "can read the large test"
+      (expect (nbt/read-uncompressed-file "test-data/bigtest-uncompressed.nbt")
+              :not :to-be nil))))
