@@ -9,6 +9,6 @@
     (it "can read the basic test"
       (let ((expected-result (make-nbt-compound :name "hello world"
                                                 :items (list (make-nbt-string :name "name"
-                                                                         :value "Bananrama")))))
+                                                                              :value "Bananrama")))))
         (expect (nbt/read-uncompressed-file "test-data/hello_world.nbt")
                 :to-equal expected-result)))))
