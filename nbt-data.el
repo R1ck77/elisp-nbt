@@ -16,12 +16,19 @@
   (nbt/read--binary-value 4 'long))
 
 (defun nbt/read-long ()
-  "long values are not supported in Emacs, so I'm returing the value as low and high significant int"
-  (list (nbt/read--binary-value 4 'int)
-        (nbt/read--binary-value 4 'int)))
+  "long values are not supported in Emacs, so I'm returing the value of the lowest significant int until I figure something out"  
+  (let ((bytes (list (nbt/read-int)
+                     (nbt/read-int))))
+    (cadr bytes)))
+
+(defun nbt/undiscovered-magic (bytes)
+  0.0)
 
 (defun nbt/read-float ()
   "Hic sunt leones. Big ones."
   (nbt/undiscovered-magic (nbt/read--binary-value 4 'long)))
+
+(defun nbt/read-double ()
+  (nbt/undiscovered-magic (nbt/read--binary-value 8 'double)))
 
 (provide 'nbt-data)
