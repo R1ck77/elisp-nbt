@@ -1,13 +1,16 @@
 (require 'cl)
 (require 'dash)
 (require 'nbt-data)
+(require 'nbt-tags-id)
+
+(defmacro comment (&rest forms))
 
 (defun debug-print-read-tag (id name)
-  (if (= 0 id)
-      (message "--> Reading End Tag")
-   (if (= (length name) 0)
-       (message "--> Reading nameless Tag")
-     (message "--> Reading '%s' tag" name))))
+  (comment (if (= 0 id)
+       (message "--> Reading End Tag")
+     (if (= (length name) 0)
+         (message "--> Reading nameless Tag")
+       (message "--> Reading '%s' tag" name)))))
 
 (cl-defstruct nbt-byte name value)
 (cl-defstruct nbt-short name value)
@@ -25,15 +28,9 @@
 (cl-defstruct nbt-start-compound name)
 (cl-defstruct nbt-end-compound)
 
-(defun nbt/read--string ()
-  (let* ((string-length (nbt/read-short))
-         (string-content (buffer-substring-no-properties (point) (+ string-length (point)))))
-    (goto-char (+ string-length (point)))
-    string-content))
-
 (defun nbt/read--string-tag (name)
   (make-nbt-string :name name
-                   :value (nbt/read--string)))
+                   :value (nbt/read-string)))
 
 (defun nbt/read--start-compound-tag (name)
   (make-nbt-start-compound :name name))
@@ -93,20 +90,6 @@
   (make-nbt-byte :name name
                  :value (nbt/read-byte)))
 
-(defconst end-tag-id 0)
-(defconst byte-tag-id 1)
-(defconst short-tag-id 2)
-(defconst int-tag-id 3)
-(defconst long-tag-id 4)
-(defconst float-tag-id 5)
-(defconst double-tag-id 6)
-(defconst byte-array-tag-id 7)
-(defconst string-tag-id 8)
-(defconst tag-list-tag-id 9)
-(defconst start-compound-tag-id 10)
-(defconst int-array-tag-id 11)
-(defconst long-array-tag-id 12)
-
 (defun nbt/read--named-tag (tag-id name)
   (debug-print-read-tag tag-id name)
   (cond
@@ -133,7 +116,7 @@
         (progn
           (debug-print-read-tag tag-id "")
           (make-nbt-end-compound))
-      (nbt/read--named-tag tag-id (nbt/read--string)))))
+      (nbt/read--named-tag tag-id (nbt/read-string)))))
 
 (defun nbt/read-all-raw-tags ()
   (let ((tags))

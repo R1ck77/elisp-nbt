@@ -1,8 +1,6 @@
 (require 'cl)
-(require 'nbt-tags)
 (require 'bindat)
-
-(cl-defstruct nbt-compound name items)
+(require 'nbt-objects)
 
 ;;; TODO/FIXME nbt-utils? I should need a dependency 
 (defun nbt/create-supplier (list)
@@ -15,9 +13,10 @@
 ;;; TODO/FIXME misnomer?
 (defun nbt/get--next-tag (supplier tag)
   (cond
-   ((nbt-start-compound-p tag) (make-nbt-compound :name (nbt-start-compound-name tag)
-                                                  :items (nbt/read--tags-from-supplier supplier)))
-   ((nbt-end-compound-p tag) nil)
+   ((nbt-raw-compound-p tag) (nbt-compound :id start-compound-tag-id
+                                           :name (nbt-name tag)
+                                           :value (nbt/read--tags-from-supplier supplier)))
+   ((nbt-end-p tag) nil)
    (t tag)))
 
 (defun nbt/read--tags-from-supplier (supplier)

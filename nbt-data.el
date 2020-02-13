@@ -31,4 +31,10 @@
 (defun nbt/read-double ()
   (nbt/undiscovered-magic (nbt/read--binary-value 8 'double)))
 
+(defun nbt/read-string ()
+  (let* ((string-length (nbt/read-short))
+         (string-content (buffer-substring-no-properties (point) (+ string-length (point)))))
+    (goto-char (+ string-length (point)))
+    string-content))
+
 (provide 'nbt-data)
