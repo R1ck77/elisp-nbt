@@ -13,8 +13,7 @@
 ;;; TODO/FIXME misnomer?
 (defun nbt/get--next-tag (supplier tag)
   (cond
-   ((nbt-raw-compound-p tag) (nbt-compound :id start-compound-tag-id
-                                           :name (nbt-name tag)
+   ((nbt-raw-compound-p tag) (nbt-compound :name (nbt-name tag)
                                            :value (nbt/read--tags-from-supplier supplier)))
    ((nbt-end-p tag) nil)
    (t tag)))
