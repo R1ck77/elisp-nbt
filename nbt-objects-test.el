@@ -16,6 +16,5 @@
         (expect (nbt/read-all-raw-tags)
                 :to-equal (list
                            (nbt-raw-compound :name "hello world")
-                           (nbt-string :name "name"
-                                       :value "Bananrama")
+                           (nbt-string :name "name" :value "Bananrama")
                            (nbt-end)))))))

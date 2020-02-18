@@ -79,9 +79,7 @@
                 :to-equal expected-result)))
     (it "can read the large test"
       (let ((structure (nbt/read-uncompressed-file "test-data/bigtest-uncompressed.nbt")))
-        (message "Thre result is: %s" structure)
         (expect structure :not :to-be nil)))
     (xit "can read the large test CORRECTLY"
       (let ((structure (nbt/read-uncompressed-file "test-data/bigtest-uncompressed.nbt")))
-        (message "Thre result is: %s" structure)
         (expect structure :to-equal big-result)))))
