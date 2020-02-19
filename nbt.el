@@ -2,8 +2,8 @@
 (require 'bindat)
 (require 'nbt-objects)
 
-;;; 1f 8b - should be followed by 0x8 
-(defconst nbt-zlib-magic-bytes '(31 139))
+;;; Those two bytes identify zlib files
+(defconst nbt-zlib-magic-bytes '(#x1f #x8b))
 
 ;;; TODO/FIXME nbt-utils? I should need a dependency 
 (defun nbt/create-supplier (list)
