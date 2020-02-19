@@ -45,6 +45,11 @@
       (error "Unable to open compressed file: missing zlib support")))
 
 (defun nbt/read-compressed-file (path)
-  ())
+  (with-temp-buffer
+    (toggle-enable-multibyte-characters nil)
+    (insert-file-contents-literally path)
+    (zlib-decompress-region (point-min) (point-max))
+    (goto-char (point-min))
+    (nbt/read-tags-list (nbt/read-all-raw-tags))))
 
 (provide 'nbt)

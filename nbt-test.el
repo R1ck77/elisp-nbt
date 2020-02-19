@@ -85,8 +85,21 @@
         (expect (nbt/read-uncompressed-file "test-data/hello_world.nbt")
                 :to-equal expected-result)))
     (it "can read the large test"
-      (let ((structure (nbt/read-uncompressed-file "test-data/bigtest-uncompressed.nbt")))
+      (let ((structure (nbt/read-uncompressed-file "test-data/bigtest_uncompressed.nbt")))
         (expect structure :not :to-be nil)))
     (xit "can read the large test CORRECTLY"
-      (let ((structure (nbt/read-uncompressed-file "test-data/bigtest-uncompressed.nbt")))
+      (let ((structure (nbt/read-uncompressed-file "test-data/bigtest_uncompressed.nbt")))
+        (expect structure :to-equal big-result))))
+  (describe "nbt/read-compressed-file"
+    (it "can read the basic test"
+      (let ((expected-result (nbt-compound :name "hello world"
+                                           :value (list (nbt-string :name "name"
+                                                                    :value "Bananrama")))))
+        (expect (nbt/read-compressed-file "test-data/hello_world_compressed.nbt")
+                :to-equal expected-result)))
+    (it "can read the large test"
+      (let ((structure (nbt/read-compressed-file "test-data/bigtest_compressed.nbt")))
+        (expect structure :not :to-be nil)))
+    (xit "can read the large test CORRECTLY"
+      (let ((structure (nbt/read-compressed-file "test-data/bigtest_compressed.nbt")))
         (expect structure :to-equal big-result)))))
