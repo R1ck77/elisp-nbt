@@ -52,4 +52,12 @@
     (goto-char (point-min))
     (nbt/read-tags-list (nbt/read-all-raw-tags))))
 
+(defun nbt/file-compressed-p (path)
+  t)
+
+(defun nbt/read-file (path)
+  (if (nbt/file-compressed-p path)
+      (nbt/read-compressed-file path)
+    (nbt/read-uncompressed-file path)))
+
 (provide 'nbt)

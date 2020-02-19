@@ -102,4 +102,22 @@
         (expect structure :not :to-be nil)))
     (xit "can read the large test CORRECTLY"
       (let ((structure (nbt/read-compressed-file "test-data/bigtest_compressed.nbt")))
-        (expect structure :to-equal big-result)))))
+        (expect structure :to-equal big-result))))
+  (describe "nbt/file-compressed-p"
+    (it "returns t for compressed files"
+      (expect (nbt/file-compressed-p "test-data/bigtest_compressed.nbt") :to-be t))
+    (it "returns nil for uncompressed files"
+      (expect (nbt/file-compressed-p "test-data/bigtest_uncompressed.nbt") :to-be nil)))
+  (describe "nbt/read-file"
+    (it "uses nbt/read-uncompressed-file if the file is not compressed"
+      (spy-on 'nbt/read-uncompressed-file :and-call-through)
+      (spy-on 'nbt/read-compressed-file :and-call-through)
+      (expect (nbt/read-file "test-data/bigtest_uncompressed.nbt") :not :to-throw 'error)
+      (expect 'nbt/read-uncompressed-file :to-have-been-called-times 1)
+      (expect 'nbt/read-compressed-file :not :to-have-been-called))
+    (it "uses nbt/read-compressed-file if the file is compressed"
+      (spy-on 'nbt/read-uncompressed-file :and-call-through)
+      (spy-on 'nbt/read-compressed-file :and-call-through)
+      (expect (nbt/read-file "test-data/bigtest_compressed.nbt") :not :to-throw 'error)
+      (expect 'nbt/read-compressed-file :to-have-been-called-times 1)
+      (expect 'nbt/read-uncompressed-file :not :to-have-been-called))))
