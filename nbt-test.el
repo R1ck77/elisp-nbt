@@ -120,4 +120,8 @@
       (spy-on 'nbt/read-compressed-file :and-call-through)
       (expect (nbt/read-file "test-data/bigtest_compressed.nbt") :not :to-throw 'error)
       (expect 'nbt/read-compressed-file :to-have-been-called-times 1)
-      (expect 'nbt/read-uncompressed-file :not :to-have-been-called))))
+      (expect 'nbt/read-uncompressed-file :not :to-have-been-called))
+    (it "can read a Minecraft™ level file"
+      (let ((content (nbt/read-file "test-data/level.dat")))
+        (message "Content is: %s" content)
+        (expect content :not :to-be nil)))))
