@@ -40,4 +40,11 @@
     (goto-char (point-min))
     (nbt/read-tags-list (nbt/read-all-raw-tags))))
 
+(defun nbt/exit-if-zlib-absent ()
+  (if (not (zlib-available-p))
+      (error "Unable to open compressed file: missing zlib support")))
+
+(defun nbt/read-compressed-file (path)
+  ())
+
 (provide 'nbt)

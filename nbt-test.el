@@ -70,6 +70,13 @@
                                    :value 32767))))
 
 (describe "nbt"
+  (describe "nbt/exit-if-zlib-absent"
+    (it "throws an error if zlib is missing"
+      (spy-on 'zlib-available-p :and-return-value nil)
+      (expect (nbt/exit-if-zlib-absent) :to-throw 'error))
+    (it "does nothing if zlib is present"
+      (spy-on 'zlib-available-p :and-return-value t)
+      (expect (nbt/exit-if-zlib-absent) :not :to-throw 'error)))
   (describe "nbt/read-uncompressed-file"
     (it "can read the basic test"
       (let ((expected-result (nbt-compound :name "hello world"
