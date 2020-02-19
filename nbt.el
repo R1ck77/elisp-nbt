@@ -2,6 +2,9 @@
 (require 'bindat)
 (require 'nbt-objects)
 
+;;; 1f 8b - should be followed by 0x8 
+(defconst nbt-zlib-magic-bytes '(31 139))
+
 ;;; TODO/FIXME nbt-utils? I should need a dependency 
 (defun nbt/create-supplier (list)
   (lexical-let ((list list))
@@ -33,11 +36,17 @@
 (defun nbt/read-tags-list (raw-tags)
   (car (nbt/read--tags-from-supplier (nbt/create-supplier raw-tags))))
 
+(defmacro nbt/with-configured-buffer (path &rest forms)
+  (declare (indent defun)
+           (debug t))
+  `(with-temp-buffer
+     (toggle-enable-multibyte-characters nil)
+     (insert-file-contents-literally ,path)
+     (goto-char (point-min))
+     ,@forms))
+
 (defun nbt/read-uncompressed-file (path)
-  (with-temp-buffer
-    (toggle-enable-multibyte-characters nil)
-    (insert-file-contents-literally path)
-    (goto-char (point-min))
+  (nbt/with-configured-buffer path
     (nbt/read-tags-list (nbt/read-all-raw-tags))))
 
 (defun nbt/exit-if-zlib-absent ()
@@ -45,15 +54,17 @@
       (error "Unable to open compressed file: missing zlib support")))
 
 (defun nbt/read-compressed-file (path)
-  (with-temp-buffer
-    (toggle-enable-multibyte-characters nil)
-    (insert-file-contents-literally path)
-    (zlib-decompress-region (point-min) (point-max))
+  (nbt/with-configured-buffer path
     (goto-char (point-min))
+    (zlib-decompress-region (point-min) (point-max))
     (nbt/read-tags-list (nbt/read-all-raw-tags))))
 
+;;; TODO/FIXME quite slow
 (defun nbt/file-compressed-p (path)
-  t)
+  (nbt/with-configured-buffer path
+    (let ((magic-bytes (list (nbt/read-byte)
+                             (nbt/read-byte))))
+      (equal nbt-zlib-magic-bytes magic-bytes))))
 
 (defun nbt/read-file (path)
   (if (nbt/file-compressed-p path)
