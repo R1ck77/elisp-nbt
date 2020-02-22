@@ -108,7 +108,6 @@
 (defmethod nbt-read ((class (subclass nbt-string)) name-f)
   (create-class class name-f #'nbt/read-string))
 
-
 ;;; TODO/FIXME this may be named in some situations? Documentation is not clear… :/
 (defclass nbt-end (nbt-tag)
   ()
@@ -140,6 +139,18 @@
 (defmethod nbt-id ((this nbt-compound))
   start-compound-tag-id)
 
+(defun nbt/read--items-until-end ()
+  (let ((next-tag)
+        (items))
+    (while (/= (nbt-id (setq next-tag (nbt/create-named-tag))) end-tag-id)
+      (setq items (cons next-tag items)))
+    items))
+
+(defmethod nbt-read ((class (subclass nbt-compound)) name-f)
+  (let ((name (funcall name-f)))
+    (nbt-compound :name name
+                  :value (nbt/read--items-until-end))))
+
 (defclass nbt-list (nbt-valued-tag nbt-named-tag)
   ()
   "List of unnamed tags")
@@ -149,15 +160,15 @@
 
 ;;; TODO/FIXE a lot of repeated code
 (defun nbt/read--list-tag (name-f)
+)
+
+(defmethod nbt-read ((class (subclass nbt-list)) name-f)
   (let* ((name (funcall name-f))
          (item-type (nbt/read-byte))
          (length (nbt/read-int)))
     (nbt-list :name name
               :value (--map (nbt/create-tag-from-id item-type (lambda () ""))
                             (number-sequence 1 length)))))
-
-(defmethod nbt-read ((class (subclass nbt-list)) name-f)
-  (nbt/read--list-tag name-f))
 
 (defclass nbt-byte-array (nbt-valued-tag nbt-named-tag)
   ()
@@ -166,14 +177,14 @@
 (defmethod nbt-id ((this nbt-byte-array))
   byte-array-tag-id)
 
-(defun nbt/read--byte-array-tag (name-f)
+(defun nbt/read--primitives-list (class name-f read-f)
   (let* ((name (funcall name-f))
          (length (nbt/read-int)))
-    (nbt-list :name name
-              :value (--map (nbt/read-byte) (number-sequence 1 length)))))
+    (apply class (list :name name
+                       :value (--map (funcall read-f) (number-sequence 1 length))))))
 
 (defmethod nbt-read ((class (subclass nbt-byte-array)) name-f)
-  (nbt/read--byte-array-tag name-f))
+  (nbt/read--primitives-list class name-f #'nbt/read-byte))
 
 (defclass nbt-int-array (nbt-valued-tag nbt-named-tag)
   ()
@@ -183,10 +194,7 @@
   int-array-tag-id)
 
 (defun nbt/read--int-array-tag (name-f)
-  (let* ((name (funcall name-f))
-         (length (nbt/read-int)))
-    (nbt-int-array :name name
-                   :value (--map (nbt/read-int) (number-sequence 1 length)))))
+  (nbt/read--primitives-list nbt-int-array name-f #'nbt/read-int))
 
 (defmethod nbt-read ((class (subclass nbt-int-array)) name-f)
   (nbt/read--int-array-tag name-f))
@@ -199,15 +207,12 @@
   long-array-tag-id)
 
 (defun nbt/read--long-array-tag (name-f)
-  (let* ((name (funcall name-f))
-         (length (nbt/read-int)))
-    (nbt-long-array :name name
-                    :value (--map (nbt/read-long) (number-sequence 1 length)))))
+  (nbt/read--primitives-list nbt-long-array name-f #'nbt/read-long))
 
 (defmethod nbt-read ((class (subclass nbt-long-array)) name-f)
   (nbt/read--long-array-tag name-f))
 
-(defvar class-for-tag-plist (list start-compound-tag-id nbt-raw-compound
+(defvar class-for-tag-plist (list start-compound-tag-id nbt-compound
                                   end-tag-id nbt-end
                                   byte-tag-id nbt-byte
                                   short-tag-id nbt-short
@@ -243,6 +248,7 @@
   (let ((tags))
     (while (/= (point) (point-max))
       (setq tags (cons (nbt/create-named-tag) tags)))
-    (nreverse tags)))
+    (assert (= 1 (length tags)))
+    (car tags)))
 
 (provide 'nbt-objects)

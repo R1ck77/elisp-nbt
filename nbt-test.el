@@ -123,5 +123,4 @@
       (expect 'nbt/read-uncompressed-file :not :to-have-been-called))
     (it "can read a Minecraft™ level file"
       (let ((content (nbt/read-file "test-data/level.dat")))
-        (message "Content is: %s" content)
         (expect content :not :to-be nil)))))
