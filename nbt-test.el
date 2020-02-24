@@ -28,46 +28,37 @@
                                                          :value 0.5))))))
 
 (defconst big-result
-  (nbt-compound :name "Level"
-                :value (list
-                        nested-compound-test
-                        (nbt-int :name "intTest"
-                                 :value 2147483647)
-                        (nbt-byte :name "byteTest"
-                                  :value 127)
-                        (nbt-string :name "stringTest"
-                                    :value "HELLO WORLD THIS IS A TEST STRING \xc3\x85\xc3\x84\xc3\x96!")
-                        (nbt-list :name "listTest (long)"
-                                  :value (list ;; TODO/FIXME in the example the name is unbound! This may create problems during the write phase
-                                          (nbt-long :name "" :value 11)
-                                          (nbt-long :name "" :value 12)
-                                          (nbt-long :name "" :value 13)
-                                          (nbt-long :name "" :value 14)
-                                          (nbt-long :name "" :value 15)))
-                        (nbt-double :name "doubleTest"
-                                    :value 0.49312871321823148)
-                        (nbt-float :name "floatTest"
-                                   :value 0.49823147058486938)
-                        (nbt-long :name "longTest"
-                                  :value 9223372036854775807)
-                        (nbt-list :name "listTest (compound)"
-                                  :value (list
-                                          (nbt-compound :name ""
-                                                        :value (list
-                                                                (nbt-long :name "created-on"
-                                                                          :value 1264099775885)
-                                                                (nbt-string :name "name"
-                                                                            :value "Compound tag #0")))
-                                          (nbt-compound :name ""
-                                                        :value (list
-                                                                (nbt-long :name "created-on"
-                                                                          :value 1264099775885)
-                                                                (nbt-string :name "name"
-                                                                            :value "Compound tag #1")))))
-                        (nbt-byte-array :name "byteArrayTest"
-                                        :value long-byte-values)
-                        (nbt-short :name "shortTest"
-                                   :value 32767))))
+  (nbt-compound :value (list
+                        (nbt-double :value 0.0 :name "doubleTest")
+                        (nbt-byte-array :value (list 0 62 34 16 8 10 22 44 76 18 70 32 4 86 78 80 92 14 46 88 40 2 74 56 48 50 62 84 16 58 10 72 44 26 18 20 32 54 86 28 80 42 14 96 88 90 2 24 56 98 50 12 84 66 58 60 72 94 26 68 20 82 54 36 28 30 42 64 96 38 90 52 24 6 98 0 12 34 66 8 60 22 94 76 68 70 82 4 36 78 30 92 64 46 38 40 52 74 6 48 0 62 34 16 8 10 22 44 76 18 70 32 4 86 78 80 92 14 46 88 40 2 74 56 48 50 62 84 16 58 10 72 44 26 18 20 32 54 86 28 80 42 14 96 88 90 2 24 56 98 50 12 84 66 58 60 72 94 26 68 20 82 54 36 28 30 42 64 96 38 90 52 24 6 98 0 12 34 66 8 60 22 94 76 68 70 82 4 36 78 30 92 64 46 38 40 52 74 6 48 0 62 34 16 8 10 22 44 76 18 70 32 4 86 78 80 92 14 46 88 40 2 74 56 48 50 62 84 16 58 10 72 44 26 18 20 32 54 86 28 80 42 14 96 88 90 2 24 56 98 50 12 84 66 58 60 72 94 26 68 20 82 54 36 28 30 42 64 96 38 90 52 24 6 98 0 12 34 66 8 60 22 94 76 68 70 82 4 36 78 30 92 64 46 38 40 52 74 6 48 0 62 34 16 8 10 22 44 76 18 70 32 4 86 78 80 92 14 46 88 40 2 74 56 48 50 62 84 16 58 10 72 44 26 18 20 32 54 86 28 80 42 14 96 88 90 2 24 56 98 50 12 84 66 58 60 72 94 26 68 20 82 54 36 28 30 42 64 96 38 90 52 24 6 98 0 12 34 66 8 60 22 94 76 68 70 82 4 36 78 30 92 64 46 38 40 52 74 6 48 0 62 34 16 8 10 22 44 76 18 70 32 4 86 78 80 92 14 46 88 40 2 74 56 48 50 62 84 16 58 10 72 44 26 18 20 32 54 86 28 80 42 14 96 88 90 2 24 56 98 50 12 84 66 58 60 72 94 26 68 20 82 54 36 28 30 42 64 96 38 90 52 24 6 98 0 12 34 66 8 60 22 94 76 68 70 82 4 36 78 30 92 64 46 38 40 52 74 6 48 0 62 34 16 8 10 22 44 76 18 70 32 4 86 78 80 92 14 46 88 40 2 74 56 48 50 62 84 16 58 10 72 44 26 18 20 32 54 86 28 80 42 14 96 88 90 2 24 56 98 50 12 84 66 58 60 72 94 26 68 20 82 54 36 28 30 42 64 96 38 90 52 24 6 98 0 12 34 66 8 60 22 94 76 68 70 82 4 36 78 30 92 64 46 38 40 52 74 6 48 0 62 34 16 8 10 22 44 76 18 70 32 4 86 78 80 92 14 46 88 40 2 74 56 48 50 62 84 16 58 10 72 44 26 18 20 32 54 86 28 80 42 14 96 88 90 2 24 56 98 50 12 84 66 58 60 72 94 26 68 20 82 54 36 28 30 42 64 96 38 90 52 24 6 98 0 12 34 66 8 60 22 94 76 68 70 82 4 36 78 30 92 64 46 38 40 52 74 6 48 0 62 34 16 8 10 22 44 76 18 70 32 4 86 78 80 92 14 46 88 40 2 74 56 48 50 62 84 16 58 10 72 44 26 18 20 32 54 86 28 80 42 14 96 88 90 2 24 56 98 50 12 84 66 58 60 72 94 26 68 20 82 54 36 28 30 42 64 96 38 90 52 24 6 98 0 12 34 66 8 60 22 94 76 68 70 82 4 36 78 30 92 64 46 38 40 52 74 6 48 0 62 34 16 8 10 22 44 76 18 70 32 4 86 78 80 92 14 46 88 40 2 74 56 48 50 62 84 16 58 10 72 44 26 18 20 32 54 86 28 80 42 14 96 88 90 2 24 56 98 50 12 84 66 58 60 72 94 26 68 20 82 54 36 28 30 42 64 96 38 90 52 24 6 98 0 12 34 66 8 60 22 94 76 68 70 82 4 36 78 30 92 64 46 38 40 52 74 6 48 0 62 34 16 8 10 22 44 76 18 70 32 4 86 78 80 92 14 46 88 40 2 74 56 48 50 62 84 16 58 10 72 44 26 18 20 32 54 86 28 80 42 14 96 88 90 2 24 56 98 50 12 84 66 58 60 72 94 26 68 20 82 54 36 28 30 42 64 96 38 90 52 24 6 98 0 12 34 66 8 60 22 94 76 68 70 82 4 36 78 30 92 64 46 38 40 52 74 6 48)
+                                        :name "byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))")
+                        (nbt-byte :value 127 :name "byteTest")
+                        (nbt-list :value (list (nbt-compound :value (list (nbt-long :value 1379390861 :name "created-on")
+                                                                          (nbt-string :value "Compound tag #0" :name "name"))
+                                                             :name "")
+                                               (nbt-compound :value (list (nbt-long :value 1379390861 :name "created-on")
+                                                                          (nbt-string :value "Compound tag #1" :name "name"))
+                                                             :name ""))
+                                  :name "listTest (compound)")
+                        (nbt-list :value (list (nbt-long :value 11 :name "")
+                                               (nbt-long :value 12 :name "")
+                                               (nbt-long :value 13 :name "")
+                                               (nbt-long :value 14 :name "")
+                                               (nbt-long :value 15 :name ""))
+                                  :name "listTest (long)")
+                        (nbt-compound :value (list (nbt-compound :value (list (nbt-float :value 0.0 :name "value")
+                                                                              (nbt-string :value "Eggbert" :name "name"))
+                                                    :name "egg")
+                                                   (nbt-compound :value (list (nbt-float :value 0.0 :name "value")
+                                                                              (nbt-string :value "Hampus" :name "name"))
+                                                                 :name "ham"))
+                                      :name "nested compound test")
+                        (nbt-int :value 2147483647 :name "intTest")
+                        (nbt-float :value 0.0 :name "floatTest")
+                        (nbt-string :value "HELLO WORLD THIS IS A TEST STRING \303\205\303\204\303\226!" :name "stringTest")
+                        (nbt-short :value 32767 :name "shortTest")
+                        (nbt-long :value 4294967295 :name "longTest"))
+                :name "Level"))
 
 (describe "nbt"
   (describe "nbt/exit-if-zlib-absent"
