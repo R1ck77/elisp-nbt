@@ -119,19 +119,6 @@
 (defmethod nbt-read ((class (subclass nbt-end)) name-f)
   (nbt-end))
 
-(defclass nbt-raw-compound (nbt-named-tag)
-  ()
-  "Raw version of the compound tag \(no items\)")
-
-(defmethod nbt-id ((this nbt-raw-compound))
-  start-compound-tag-id)
-
-(defun nbt/read--raw-compound-tag (name-f)
-  (nbt-raw-compound :name (funcall name-f)))
-
-(defmethod nbt-read ((class (subclass nbt-raw-compound)) name-f)
-  (nbt/read--raw-compound-tag name-f))
-
 (defclass nbt-compound (nbt-valued-tag nbt-named-tag)
   ()
   "Compound tag: items is a \(possibly empty\) list of tags")
@@ -144,7 +131,7 @@
         (items))
     (while (/= (nbt-id (setq next-tag (nbt/create-named-tag))) end-tag-id)
       (setq items (cons next-tag items)))
-    items))
+    (nreverse items)))
 
 (defmethod nbt-read ((class (subclass nbt-compound)) name-f)
   (let ((name (funcall name-f)))
