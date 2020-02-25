@@ -1,4 +1,5 @@
 (require 'bindat)
+(require 'nbt-ieee754)
 
 (defun nbt/read--binary-value (size type)
   (let ((result (bindat-unpack (list (list 'unused-name type))
@@ -21,15 +22,11 @@
                      (nbt/read-int))))
     (cadr bytes)))
 
-(defun nbt/undiscovered-magic (bytes)
-  0.0)
-
 (defun nbt/read-float ()
-  "Hic sunt leones. Big ones."
-  (nbt/undiscovered-magic (nbt/read--binary-value 4 'long)))
+  (nbt/convert-bytes-to-float (nbt/read--binary-value 4 'long)))
 
 (defun nbt/read-double ()
-  (nbt/undiscovered-magic (nbt/read--binary-value 8 'double)))
+  (nbt/convert-bytes-to-double (nbt/read--binary-value 8 'double)))
 
 (defun nbt/read-string ()
   (let* ((string-length (nbt/read-short))

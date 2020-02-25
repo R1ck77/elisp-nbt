@@ -2,7 +2,6 @@
 (require 'dash)
 (require 'nbt-tags-id)
 (require 'nbt-data)
-(require 'nbt-ieee754)
 
 (defclass nbt-tag ()
   ()
