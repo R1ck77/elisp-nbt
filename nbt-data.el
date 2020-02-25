@@ -1,4 +1,5 @@
 (require 'bindat)
+(require 'dash)
 (require 'nbt-ieee754)
 
 (defun nbt/read--binary-value (size type)
@@ -22,11 +23,12 @@
                      (nbt/read-int))))
     (cadr bytes)))
 
+;;; TODO/FIXME can be probably read with a single bindat call
 (defun nbt/read-float ()
-  (nbt/convert-bytes-to-float (nbt/read--binary-value 4 'long)))
+  (nbt/convert-bytes-to-float (--map (nbt/read-byte) (number-sequence 1 4))))
 
 (defun nbt/read-double ()
-  (nbt/convert-bytes-to-double (nbt/read--binary-value 8 'double)))
+  (nbt/convert-bytes-to-double (--map (nbt/read-byte) (number-sequence 1 8))))
 
 (defun nbt/read-string ()
   (let* ((string-length (nbt/read-short))
