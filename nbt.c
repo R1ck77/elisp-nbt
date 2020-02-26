@@ -29,6 +29,7 @@ union float_union {
 static emacs_value convert_to_float(emacs_env *env, ptrdiff_t nargs, emacs_value *args, void *data)
 {
   union float_union x;
+
   x.byte_values[0] = env->extract_integer(env, args[3]);
   x.byte_values[1] = env->extract_integer(env, args[2]);
   x.byte_values[2] = env->extract_integer(env, args[1]);
@@ -53,6 +54,7 @@ union double_union {
 static emacs_value convert_to_double(emacs_env *env, ptrdiff_t nargs, emacs_value *args, void *data)
 {
   union double_union x;
+
   x.byte_values[0] = env->extract_integer(env, args[7]);
   x.byte_values[1] = env->extract_integer(env, args[6]);
   x.byte_values[2] = env->extract_integer(env, args[5]);
@@ -73,10 +75,43 @@ static void create_convert_to_double(emacs_env *env)
   env->funcall(env, env->intern(env, "defalias"), 2, args);
 }
 
+union long_union {
+  long long_value;
+  char byte_values[8];
+};
+
+static emacs_value convert_to_long(emacs_env *env, ptrdiff_t nargs, emacs_value *args, void *data)
+{
+  union long_union x;
+  char string_representation[64];
+  
+  x.byte_values[0] = env->extract_integer(env, args[7]);
+  x.byte_values[1] = env->extract_integer(env, args[6]);
+  x.byte_values[2] = env->extract_integer(env, args[5]);
+  x.byte_values[3] = env->extract_integer(env, args[4]);
+  x.byte_values[4] = env->extract_integer(env, args[3]);
+  x.byte_values[5] = env->extract_integer(env, args[2]);
+  x.byte_values[6] = env->extract_integer(env, args[1]);
+  x.byte_values[7] = env->extract_integer(env, args[0]);
+
+  snprintf(string_representation, 64, "%ld", x.long_value);
+
+  return env->make_string(env, string_representation, strlen(string_representation));
+}
+
+static void create_convert_to_long(emacs_env *env)
+{
+  emacs_value args[2];
+  args[0] = env->intern(env, "nbt-convert-to-long");
+  args[1] = env->make_function(env, 8, 8, convert_to_long, "Convert 8 bytes to integer", NULL);
+  env->funcall(env, env->intern(env, "defalias"), 2, args);
+}
+
 int emacs_module_init(struct emacs_runtime *runtime)
 {
   create_hello_world(runtime->get_environment(runtime));
   create_convert_to_float(runtime->get_environment(runtime));
   create_convert_to_double(runtime->get_environment(runtime));
+  create_convert_to_long(runtime->get_environment(runtime));
   return 0;
 }

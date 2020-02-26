@@ -17,11 +17,9 @@
 (defun nbt/read-int ()
   (nbt/read--binary-value 4 'long))
 
+;;; TODO/FIXME can be probably read with a single bindat call
 (defun nbt/read-long ()
-  "long values are not supported in Emacs, so I'm returing the value of the lowest significant int until I figure something out"  
-  (let ((bytes (list (nbt/read-int)
-                     (nbt/read-int))))
-    (cadr bytes)))
+  (nbt/convert-bytes-to-long (--map (nbt/read-byte) (number-sequence 1 8))))
 
 ;;; TODO/FIXME can be probably read with a single bindat call
 (defun nbt/read-float ()

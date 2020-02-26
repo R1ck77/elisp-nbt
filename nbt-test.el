@@ -27,8 +27,6 @@
                                               (nbt-float :name "value"
                                                          :value 0.5))))))
 
-;;; TODO/FIXME long values not supported
-;;; TODO/FIXME double and float values not supported
 (defconst big-result
   (nbt-compound :value (list
                         (nbt-long :value 4294967295 :name "longTest")
