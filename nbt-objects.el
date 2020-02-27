@@ -16,17 +16,15 @@
   (and (object-of-class-p that nbt-tag)
        (= (nbt-id this) (nbt-id that))))
 
-(defclass nbt-valued-tag (nbt-tag)
-  ((value :initarg :value
-          :documentation "the tag content"))
-  :abstract t)
+(defclass nbt-end (nbt-tag)
+  ()
+  "Ignoring the possibility of a named tag")
 
-(defmethod nbt-value ((this nbt-valued-tag))
-  (oref this value))
+(defmethod nbt-id ((this nbt-end))
+  end-tag-id)
 
-(defgeneric nbt-read ((class (subclass nbt-valued-tag)) name-reader-f))
-
-(defgeneric nbt-write ((this nbt-valued-tag)))
+(defmethod nbt-read ((class (subclass nbt-end)) name-f)
+  (nbt-end))
 
 (defclass nbt-named-tag (nbt-tag)
   ((name :initarg :name
@@ -41,7 +39,19 @@
   (and (call-next-method)
        (equal (nbt-name this) (nbt-name that))))
 
-(defclass nbt-byte (nbt-valued-tag nbt-named-tag)
+(defclass nbt-valued-tag (nbt-named-tag)
+  ((value :initarg :value
+          :documentation "the tag content"))
+  :abstract t)
+
+(defmethod nbt-value ((this nbt-valued-tag))
+  (oref this value))
+
+(defgeneric nbt-read ((class (subclass nbt-valued-tag)) name-reader-f))
+
+(defgeneric nbt-write ((this nbt-valued-tag)))
+
+(defclass nbt-byte (nbt-valued-tag)
   ()
   "Byte tag representation")
 
@@ -55,7 +65,7 @@
   (and (call-next-method)
        (= (nbt-value this) (nbt-value that))))
 
-(defclass nbt-short (nbt-valued-tag nbt-named-tag)
+(defclass nbt-short (nbt-valued-tag)
   ()
   "Short tag representation")
 
@@ -73,7 +83,7 @@
   (and (call-next-method)
        (= (nbt-value this) (nbt-value that))))
 
-(defclass nbt-int (nbt-valued-tag nbt-named-tag)
+(defclass nbt-int (nbt-valued-tag)
   ()
   "Long tag representation")
 
@@ -87,7 +97,7 @@
   (and (call-next-method)
        (= (nbt-value this) (nbt-value that))))
 
-(defclass nbt-long (nbt-valued-tag nbt-named-tag)
+(defclass nbt-long (nbt-valued-tag)
   ()
   "Long tag representation")
 
@@ -101,7 +111,7 @@
   (and (call-next-method)
        (equal (nbt-value this) (nbt-value that))))
 
-(defclass nbt-float (nbt-valued-tag nbt-named-tag)
+(defclass nbt-float (nbt-valued-tag)
   ()
   "Float tag representation")
 
@@ -120,7 +130,7 @@
        (nbt/float--equality-function (nbt-value this)
                                      (nbt-value that))))
 
-(defclass nbt-double (nbt-valued-tag nbt-named-tag)
+(defclass nbt-double (nbt-valued-tag)
   ()
   "Double tag representation")
 
@@ -139,7 +149,7 @@
        (nbt/double--equality-function (nbt-value this)
                                       (nbt-value that))))
 
-(defclass nbt-string (nbt-valued-tag nbt-named-tag)
+(defclass nbt-string (nbt-valued-tag)
   ()
   "String tag representation")
 
@@ -154,18 +164,7 @@
   (and (call-next-method)
        (equal (nbt-value this) (nbt-value that))))
 
-;;; TODO/FIXME this may be named in some situations? Documentation is not clear… :/
-(defclass nbt-end (nbt-tag)
-  ()
-  "Ignoring the possibility of a named tag")
-
-(defmethod nbt-id ((this nbt-end))
-  end-tag-id)
-
-(defmethod nbt-read ((class (subclass nbt-end)) name-f)
-  (nbt-end))
-
-(defclass nbt-compound (nbt-valued-tag nbt-named-tag)
+(defclass nbt-compound (nbt-valued-tag)
   ()
   "Compound tag: items is a \(possibly empty\) list of tags")
 
@@ -199,7 +198,7 @@
               (= (length this-tags) (length that-tags))
               (nbt/compare--tags this-tags that-tags)))))
 
-(defclass nbt-list (nbt-valued-tag nbt-named-tag)
+(defclass nbt-list (nbt-valued-tag)
   ()
   "List of unnamed tags")
 
@@ -218,7 +217,7 @@
               :value (--map (nbt/create-tag-from-id item-type (lambda () ""))
                             (number-sequence 1 length)))))
 
-(defclass nbt-byte-array (nbt-valued-tag nbt-named-tag)
+(defclass nbt-byte-array (nbt-valued-tag)
   ()
   "List of bytes")
 
@@ -239,7 +238,7 @@
        (equal (nbt-value this)
               (nbt-value that))))
 
-(defclass nbt-int-array (nbt-valued-tag nbt-named-tag)
+(defclass nbt-int-array (nbt-valued-tag)
   ()
   "List of integers")
 
@@ -257,7 +256,7 @@
        (equal (nbt-value this)
               (nbt-value that))))
 
-(defclass nbt-long-array (nbt-valued-tag nbt-named-tag)
+(defclass nbt-long-array (nbt-valued-tag)
   ()
   "List of long values")
 
