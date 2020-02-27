@@ -1,6 +1,6 @@
 (require 'bindat)
 (require 'dash)
-(require 'nbt-ieee754)
+(require 'nbt-native)
 
 (defun nbt/read--binary-value (size type)
   (let ((result (bindat-unpack (list (list 'unused-name type))

@@ -1,7 +1,7 @@
 (require 'buttercup)
-(require 'nbt-ieee754)
+(require 'nbt-native)
 
-(describe "nbt-ieee754"
+(describe "nbt-native"
   (describe "nbt/hello-world"
     (it "returns the expected value"
       (nbt/check-environment)

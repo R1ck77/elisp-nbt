@@ -1,4 +1,4 @@
-;;; C-supported routines for floating point conversion
+;;; C-supported routines for numbers conversion/manipulation
 
 (defun nbt/ensure-module-file-support ()
   (if (not module-file-suffix)
@@ -19,9 +19,8 @@
   (nbt/check-environment)
   (apply 'nbt-convert-to-double bytes))
 
-;;; TODO/FIXME either rename the module or move this (first option)
 (defun nbt/convert-bytes-to-long (bytes)
   (nbt/check-environment)
   (apply 'nbt-convert-to-long bytes))
 
-(provide 'nbt-ieee754)
+(provide 'nbt-native)
