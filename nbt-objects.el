@@ -3,12 +3,18 @@
 (require 'nbt-tags-id)
 (require 'nbt-data)
 
+;;; TODO/FIXME the hierarchy is really, really messed up. Much code can be converted to macros or generic
+
 (defclass nbt-tag ()
   ()
   :abstract t)
 
 (defmethod nbt-id ((this nbt-tag))
   (oref this id))
+
+(defmethod nbt-equal ((this nbt-tag) that)
+  (and (object-of-class-p that nbt-tag)
+       (= (nbt-id this) (nbt-id that))))
 
 (defclass nbt-valued-tag (nbt-tag)
   ((value :initarg :value
@@ -28,8 +34,12 @@
          :documentation "tag name"))
   :abstract t)
 
-(defmethod nbt-name  ((this nbt-named-tag))
+(defmethod nbt-name ((this nbt-named-tag))
   (oref this name))
+
+(defmethod nbt-equal ((this nbt-named-tag) that)
+  (and (call-next-method)
+       (equal (nbt-name this) (nbt-name that))))
 
 (defclass nbt-byte (nbt-valued-tag nbt-named-tag)
   ()
@@ -40,6 +50,10 @@
 
 (defmethod nbt-read ((class (subclass nbt-byte)) name-f)
   (create-class class name-f #'nbt/read-byte))
+
+(defmethod nbt-equal ((this nbt-byte) that)
+  (and (call-next-method)
+       (= (nbt-value this) (nbt-value that))))
 
 (defclass nbt-short (nbt-valued-tag nbt-named-tag)
   ()
@@ -55,8 +69,9 @@
 (defmethod nbt-read ((class (subclass nbt-short)) name-f)
   (create-class class name-f #'nbt/read-short))
 
-(defun nbt/read-short-tag (name)
-  )
+(defmethod nbt-equal ((this nbt-short) that)
+  (and (call-next-method)
+       (= (nbt-value this) (nbt-value that))))
 
 (defclass nbt-int (nbt-valued-tag nbt-named-tag)
   ()
@@ -68,6 +83,10 @@
 (defmethod nbt-read ((class (subclass nbt-int)) name-f)
   (create-class class name-f #'nbt/read-int))
 
+(defmethod nbt-equal ((this nbt-int) that)
+  (and (call-next-method)
+       (= (nbt-value this) (nbt-value that))))
+
 (defclass nbt-long (nbt-valued-tag nbt-named-tag)
   ()
   "Long tag representation")
@@ -77,6 +96,10 @@
 
 (defmethod nbt-read ((class (subclass nbt-long)) name-f)
   (create-class class name-f #'nbt/read-long))
+
+(defmethod nbt-equal ((this nbt-long) that)
+  (and (call-next-method)
+       (equal (nbt-value this) (nbt-value that))))
 
 (defclass nbt-float (nbt-valued-tag nbt-named-tag)
   ()
@@ -88,6 +111,15 @@
 (defmethod nbt-read ((class (subclass nbt-float)) name-f)
   (create-class class name-f #'nbt/read-float))
 
+(defun nbt/float--equality-function (a b)
+  "Fixture for (easier) debugging"
+  (= a b))
+
+(defmethod nbt-equal ((this nbt-float) that)
+  (and (call-next-method)
+       (nbt/float--equality-function (nbt-value this)
+                                     (nbt-value that))))
+
 (defclass nbt-double (nbt-valued-tag nbt-named-tag)
   ()
   "Double tag representation")
@@ -98,6 +130,15 @@
 (defmethod nbt-read ((class (subclass nbt-double)) name-f)
   (create-class class name-f #'nbt/read-double))
 
+(defun nbt/double--equality-function (a b)
+  "Fixture for (easier) debugging"
+  (= a b))
+
+(defmethod nbt-equal ((this nbt-double) that)
+  (and (call-next-method)
+       (nbt/double--equality-function (nbt-value this)
+                                      (nbt-value that))))
+
 (defclass nbt-string (nbt-valued-tag nbt-named-tag)
   ()
   "String tag representation")
@@ -107,6 +148,11 @@
 
 (defmethod nbt-read ((class (subclass nbt-string)) name-f)
   (create-class class name-f #'nbt/read-string))
+
+;;; TODO/FIXME not sure about method resolution here…
+(defmethod nbt-equal ((this nbt-string) that)
+  (and (call-next-method)
+       (equal (nbt-value this) (nbt-value that))))
 
 ;;; TODO/FIXME this may be named in some situations? Documentation is not clear… :/
 (defclass nbt-end (nbt-tag)
@@ -137,6 +183,21 @@
   (let ((name (funcall name-f)))
     (nbt-compound :name name
                   :value (nbt/read--items-until-end))))
+
+(defun nbt/compare--tags (tags-a tags-b)
+  (let ((zipped (-zip-with #'cons tags-a tags-b)))
+    (--reduce-from (and acc (nbt-equal (car it)
+                                       (cdr it)))
+                   t
+                   zipped)))
+
+(defmethod nbt-equal ((this nbt-compound) that)
+  (and (call-next-method)
+       (let ((this-tags (nbt-value this))
+             (that-tags (nbt-value that)))
+         (and (call-next-method)
+              (= (length this-tags) (length that-tags))
+              (nbt/compare--tags this-tags that-tags)))))
 
 (defclass nbt-list (nbt-valued-tag nbt-named-tag)
   ()
@@ -173,6 +234,11 @@
 (defmethod nbt-read ((class (subclass nbt-byte-array)) name-f)
   (nbt/read--primitives-list class name-f #'nbt/read-byte))
 
+(defmethod nbt-equal ((this nbt-byte-array) that)
+  (and (call-next-method)
+       (equal (nbt-value this)
+              (nbt-value that))))
+
 (defclass nbt-int-array (nbt-valued-tag nbt-named-tag)
   ()
   "List of integers")
@@ -186,6 +252,11 @@
 (defmethod nbt-read ((class (subclass nbt-int-array)) name-f)
   (nbt/read--int-array-tag name-f))
 
+(defmethod nbt-equal ((this nbt-int-array) that)
+  (and (call-next-method)
+       (equal (nbt-value this)
+              (nbt-value that))))
+
 (defclass nbt-long-array (nbt-valued-tag nbt-named-tag)
   ()
   "List of long values")
@@ -198,6 +269,11 @@
 
 (defmethod nbt-read ((class (subclass nbt-long-array)) name-f)
   (nbt/read--long-array-tag name-f))
+
+(defmethod nbt-equal ((this nbt-long-array) that)
+  (and (call-next-method)
+       (equal (nbt-value this)
+              (nbt-value that))))
 
 (defvar class-for-tag-plist (list start-compound-tag-id nbt-compound
                                   end-tag-id nbt-end

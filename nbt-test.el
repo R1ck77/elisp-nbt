@@ -9,8 +9,6 @@
         (* n 7))
      100))
 
-(defconst long-byte-values (-map #'debug-term-f (number-sequence 0 999)))
-
 (defconst nested-compound-test
   (nbt-compound :name "nested compound test"
                 :value (list
@@ -29,7 +27,7 @@
 
 (defconst big-result
   (nbt-compound :value (list
-                        (nbt-long :value 4294967295 :name "longTest")
+                        (nbt-long :value "9223372036854775807" :name "longTest")
                         (nbt-short :value 32767 :name "shortTest")
                         (nbt-string :value "HELLO WORLD THIS IS A TEST STRING \303\205\303\204\303\226!" :name "stringTest")
                         (nbt-float :value 0.49823147 :name "floatTest")
@@ -41,17 +39,17 @@
                                                                               (nbt-float :value 0.5 :name "value"))
                                                                  :name "egg"))
                                       :name "nested compound test")
-                        (nbt-list :value (list (nbt-long :value 11 :name "")
-                                               (nbt-long :value 12 :name "")
-                                               (nbt-long :value 13 :name "")
-                                               (nbt-long :value 14 :name "")
-                                               (nbt-long :value 15 :name ""))
+                        (nbt-list :value (list (nbt-long :value "11" :name "")
+                                               (nbt-long :value "12" :name "")
+                                               (nbt-long :value "13" :name "")
+                                               (nbt-long :value "14" :name "")
+                                               (nbt-long :value "15" :name ""))
                                   :name "listTest (long)")
                         (nbt-list :value (list (nbt-compound :value (list (nbt-string :value "Compound tag #0" :name "name")
-                                                                          (nbt-long :value 1379390861 :name "created-on"))
+                                                                          (nbt-long :value "1264099775885" :name "created-on"))
                                                              :name "")
                                                (nbt-compound :value (list (nbt-string :value "Compound tag #1" :name "name")
-                                                                          (nbt-long :value 1379390861 :name "created-on"))
+                                                                          (nbt-long :value "1264099775885" :name "created-on"))
                                                              :name ""))
                                   :name "listTest (compound)")
                         (nbt-byte :value 127 :name "byteTest")
@@ -79,8 +77,14 @@
       (let ((structure (nbt/read-uncompressed-file "test-data/bigtest_uncompressed.nbt")))
         (expect structure :not :to-be nil)))
     (it "can read the large test CORRECTLY"
+      (spy-on 'nbt/double--equality-function
+              :and-call-fake (lambda (a b)
+                               (< (abs (- a b)) 1e-8)))
+      (spy-on 'nbt/float--equality-function
+              :and-call-fake (lambda (a b)
+                               (< (abs (- a b)) 1e-6)))
       (let ((structure (nbt/read-uncompressed-file "test-data/bigtest_uncompressed.nbt")))
-        (expect structure :to-equal big-result))))
+        (expect (nbt-equal structure big-result) :to-be t))))
   (describe "nbt/read-compressed-file"
     (it "can read the basic test"
       (let ((expected-result (nbt-compound :name "hello world"
@@ -91,9 +95,15 @@
     (it "can read the large test"
       (let ((structure (nbt/read-compressed-file "test-data/bigtest_compressed.nbt")))
         (expect structure :not :to-be nil)))
-    (xit "can read the large test CORRECTLY"
+    (it "can read the large test CORRECTLY"
+      (spy-on 'nbt/double--equality-function
+              :and-call-fake (lambda (a b)
+                               (< (abs (- a b)) 1e-8)))
+      (spy-on 'nbt/float--equality-function
+              :and-call-fake (lambda (a b)
+                               (< (abs (- a b)) 1e-6)))
       (let ((structure (nbt/read-compressed-file "test-data/bigtest_compressed.nbt")))
-        (expect structure :to-equal big-result))))
+        (expect (nbt-equal structure big-result) :to-be t))))
   (describe "nbt/file-compressed-p"
     (it "returns t for compressed files"
       (expect (nbt/file-compressed-p "test-data/bigtest_compressed.nbt") :to-be t))
