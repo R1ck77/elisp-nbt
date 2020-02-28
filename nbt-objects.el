@@ -41,7 +41,8 @@
 
 (defclass nbt-valued-tag (nbt-named-tag)
   ((value :initarg :value
-          :documentation "the tag content"))
+          :documentation "the tag content")
+   (equality :initvalue #'=))
   :abstract t)
 
 (defmethod nbt-value ((this nbt-valued-tag))
@@ -51,7 +52,21 @@
 
 (defgeneric nbt-write ((this nbt-valued-tag)))
 
-(defclass nbt-byte (nbt-valued-tag)
+(defclass nbt-integer-tag (nbt-valued-tag)
+  ()
+  :abstract t
+  :docstring "Integer value")
+
+(defclass nbt-supported-integer-tag (nbt-integer-tag)
+  ()
+  :abstract t
+  :docstring "Integer tags that are supported natively in Emacs")
+
+(defmethod nbt-equal ((this nbt-supported-integer-tag) that)
+  (and (call-next-method)
+       (= (nbt-value this) (nbt-value that))))
+
+(defclass nbt-byte (nbt-supported-integer-tag)
   ()
   "Byte tag representation")
 
@@ -61,11 +76,7 @@
 (defmethod nbt-read ((class (subclass nbt-byte)) name-f)
   (create-class class name-f #'nbt/read-byte))
 
-(defmethod nbt-equal ((this nbt-byte) that)
-  (and (call-next-method)
-       (= (nbt-value this) (nbt-value that))))
-
-(defclass nbt-short (nbt-valued-tag)
+(defclass nbt-short (nbt-supported-integer-tag)
   ()
   "Short tag representation")
 
@@ -79,11 +90,7 @@
 (defmethod nbt-read ((class (subclass nbt-short)) name-f)
   (create-class class name-f #'nbt/read-short))
 
-(defmethod nbt-equal ((this nbt-short) that)
-  (and (call-next-method)
-       (= (nbt-value this) (nbt-value that))))
-
-(defclass nbt-int (nbt-valued-tag)
+(defclass nbt-int (nbt-supported-integer-tag)
   ()
   "Long tag representation")
 
@@ -93,11 +100,7 @@
 (defmethod nbt-read ((class (subclass nbt-int)) name-f)
   (create-class class name-f #'nbt/read-int))
 
-(defmethod nbt-equal ((this nbt-int) that)
-  (and (call-next-method)
-       (= (nbt-value this) (nbt-value that))))
-
-(defclass nbt-long (nbt-valued-tag)
+(defclass nbt-long (nbt-integer-tag)
   ()
   "Long tag representation")
 
@@ -159,7 +162,6 @@
 (defmethod nbt-read ((class (subclass nbt-string)) name-f)
   (create-class class name-f #'nbt/read-string))
 
-;;; TODO/FIXME not sure about method resolution here…
 (defmethod nbt-equal ((this nbt-string) that)
   (and (call-next-method)
        (equal (nbt-value this) (nbt-value that))))
@@ -206,9 +208,6 @@
   tag-list-tag-id)
 
 ;;; TODO/FIXE a lot of repeated code
-(defun nbt/read--list-tag (name-f)
-)
-
 (defmethod nbt-read ((class (subclass nbt-list)) name-f)
   (let* ((name (funcall name-f))
          (item-type (nbt/read-byte))
