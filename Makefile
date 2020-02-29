@@ -7,7 +7,7 @@ CFLAGS=-Wall -Wextra -O3 -fPIC $(EMACS_INCLUDE_FOLDER)
 
 run: test
 
-# TODO/FIXME this works only on specific systems. Check the joystick demo for a more general approach
+# TODO/FIXME works on linux/mac only. Windows would have a dll extension, I guess
 libnbt.so: nbt.c
 	gcc -shared $(CFLAGS) -o $@ $<
 
