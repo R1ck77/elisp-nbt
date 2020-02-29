@@ -10,6 +10,9 @@ static const char *HELLO_WORLD = "Hello, World (from C)!";
 
 static emacs_value hello_world(emacs_env *env, ptrdiff_t nargs, emacs_value *args, void *data)
 {
+  (void) nargs;
+  (void) args;
+  (void) data;
   return env->make_string(env, HELLO_WORLD, strlen(HELLO_WORLD));
 }
 
@@ -29,6 +32,8 @@ union float_union {
 static emacs_value convert_to_float(emacs_env *env, ptrdiff_t nargs, emacs_value *args, void *data)
 {
   union float_union x;
+  (void) nargs;
+  (void) data;
 
   x.byte_values[0] = env->extract_integer(env, args[3]);
   x.byte_values[1] = env->extract_integer(env, args[2]);
@@ -48,12 +53,14 @@ static void create_convert_to_float(emacs_env *env)
 
 union double_union {
   double double_value;
-  char byte_values[4];
+  char byte_values[8];
 };
 
 static emacs_value convert_to_double(emacs_env *env, ptrdiff_t nargs, emacs_value *args, void *data)
 {
   union double_union x;
+  (void) nargs;
+  (void) data;
 
   x.byte_values[0] = env->extract_integer(env, args[7]);
   x.byte_values[1] = env->extract_integer(env, args[6]);
@@ -84,6 +91,8 @@ static emacs_value convert_to_long(emacs_env *env, ptrdiff_t nargs, emacs_value 
 {
   union long_union x;
   char string_representation[64];
+  (void) nargs;
+  (void) data;
   
   x.byte_values[0] = env->extract_integer(env, args[7]);
   x.byte_values[1] = env->extract_integer(env, args[6]);
