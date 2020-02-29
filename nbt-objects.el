@@ -3,8 +3,6 @@
 (require 'nbt-tags-id)
 (require 'nbt-data)
 
-;;; TODO/FIXME the hierarchy is really, really messed up. Much code can be converted to macros or generic
-
 (defclass nbt-tag ()
   ()
   :abstract t)
@@ -207,7 +205,6 @@
 (defmethod nbt-id ((this nbt-list))
   tag-list-tag-id)
 
-;;; TODO/FIXE a lot of repeated code
 (defmethod nbt-read ((class (subclass nbt-list)) name-f)
   (let* ((name (funcall name-f))
          (item-type (nbt/read-byte))
@@ -229,14 +226,17 @@
   ()
   "List of bytes")
 
+(defun nbt/read--primitives-list (constructor name-f read-f)
+    (let* ((name (funcall name-f))
+         (length (nbt/read-int)))
+    (apply constructor (list :name name
+                             :value (--map (funcall read-f) (number-sequence 1 length))))))
+
 (defmethod nbt-id ((this nbt-byte-array))
   byte-array-tag-id)
 
 (defmethod nbt-read ((class (subclass nbt-byte-array)) name-f)
-  (let* ((name (funcall name-f))
-         (length (nbt/read-int)))
-    (apply class (list :name name
-                       :value (--map (nbt/read-byte) (number-sequence 1 length))))))
+  (nbt/read--primitives-list class name-f #'nbt/read-byte))
 
 (defclass nbt-int-array (nbt-integer-array)
   ()
