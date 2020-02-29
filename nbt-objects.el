@@ -216,62 +216,47 @@
               :value (--map (nbt/create-tag-from-id item-type (lambda () ""))
                             (number-sequence 1 length)))))
 
-(defclass nbt-byte-array (nbt-valued-tag)
+(defclass nbt-integer-array (nbt-valued-tag)
+  ()
+  "byte, short and long lists of arrays")
+
+(defmethod nbt-equal ((this nbt-integer-array) that)
+    (and (call-next-method)
+       (equal (nbt-value this)
+              (nbt-value that))))
+
+(defclass nbt-byte-array (nbt-integer-array)
   ()
   "List of bytes")
 
 (defmethod nbt-id ((this nbt-byte-array))
   byte-array-tag-id)
 
-(defun nbt/read--primitives-list (class name-f read-f)
+(defmethod nbt-read ((class (subclass nbt-byte-array)) name-f)
   (let* ((name (funcall name-f))
          (length (nbt/read-int)))
     (apply class (list :name name
-                       :value (--map (funcall read-f) (number-sequence 1 length))))))
+                       :value (--map (nbt/read-byte) (number-sequence 1 length))))))
 
-(defmethod nbt-read ((class (subclass nbt-byte-array)) name-f)
-  (nbt/read--primitives-list class name-f #'nbt/read-byte))
-
-(defmethod nbt-equal ((this nbt-byte-array) that)
-  (and (call-next-method)
-       (equal (nbt-value this)
-              (nbt-value that))))
-
-(defclass nbt-int-array (nbt-valued-tag)
+(defclass nbt-int-array (nbt-integer-array)
   ()
   "List of integers")
 
 (defmethod nbt-id ((this nbt-int-array))
   int-array-tag-id)
 
-(defun nbt/read--int-array-tag (name-f)
+(defmethod nbt-read ((class (subclass nbt-int-array)) name-f)
   (nbt/read--primitives-list nbt-int-array name-f #'nbt/read-int))
 
-(defmethod nbt-read ((class (subclass nbt-int-array)) name-f)
-  (nbt/read--int-array-tag name-f))
-
-(defmethod nbt-equal ((this nbt-int-array) that)
-  (and (call-next-method)
-       (equal (nbt-value this)
-              (nbt-value that))))
-
-(defclass nbt-long-array (nbt-valued-tag)
+(defclass nbt-long-array (nbt-integer-array)
   ()
   "List of long values")
 
 (defmethod nbt-id ((this nbt-long-array))
   long-array-tag-id)
 
-(defun nbt/read--long-array-tag (name-f)
-  (nbt/read--primitives-list nbt-long-array name-f #'nbt/read-long))
-
 (defmethod nbt-read ((class (subclass nbt-long-array)) name-f)
-  (nbt/read--long-array-tag name-f))
-
-(defmethod nbt-equal ((this nbt-long-array) that)
-  (and (call-next-method)
-       (equal (nbt-value this)
-              (nbt-value that))))
+  (nbt/read--primitives-list nbt-long-array name-f #'nbt/read-long))
 
 (defvar class-for-tag-plist (list start-compound-tag-id nbt-compound
                                   end-tag-id nbt-end
