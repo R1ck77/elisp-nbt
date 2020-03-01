@@ -183,8 +183,11 @@
     (nbt-compound :name name
                   :value (nbt/read--items-until-end))))
 
+(defun nbt/zip-lists (list-a list-b)
+  (-zip-with #'cons list-a list-b))
+
 (defun nbt/compare--tags (tags-a tags-b)
-  (let ((zipped (-zip-with #'cons tags-a tags-b)))
+  (let ((zipped (nbt/zip-lists tags-a tags-b)))
     (--reduce-from (and acc (nbt-equal (car it)
                                        (cdr it)))
                    t
@@ -199,7 +202,7 @@
               (nbt/compare--tags this-tags that-tags)))))
 
 (defclass nbt-list (nbt-valued-tag)
-  ()
+  ((elements-type :initarg :elements-type))
   "List of unnamed tags")
 
 (defmethod nbt-id ((this nbt-list))
@@ -207,18 +210,28 @@
 
 (defmethod nbt-read ((class (subclass nbt-list)) name-f)
   (let* ((name (funcall name-f))
-         (item-type (nbt/read-byte))
+         (items-type (nbt/read-byte))
          (length (nbt/read-int)))
     (nbt-list :name name
-              :value (--map (nbt/create-tag-from-id item-type (lambda () ""))
+              :elements-type items-type
+              :value (--map (nbt/create-tag-from-id items-type (lambda () ""))
                             (number-sequence 1 length)))))
+
+(defmethod nbt-equal ((this nbt-list) that)
+  (and (call-next-method)
+       (= (oref this elements-type)
+          (oref this elements-type))
+       (= (length (oref this value))
+          (length (oref that value)))
+       (nbt/compare--tags (oref this value)
+                          (oref that value))))
 
 (defclass nbt-integer-array (nbt-valued-tag)
   ()
   "byte, short and long lists of arrays")
 
 (defmethod nbt-equal ((this nbt-integer-array) that)
-    (and (call-next-method)
+  (and (call-next-method)
        (equal (nbt-value this)
               (nbt-value that))))
 

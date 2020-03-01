@@ -84,7 +84,81 @@
       (it "is different when the subtags are different"
         (expect (nbt-equal compound-sample
                            compound-sample-different-items)
+                :to-be nil)))
+    (describe "nbt-list"
+      (it "is equal to a list with same name and values"
+        (expect (nbt-equal (nbt-list :name "list name"
+                                     :elements-type byte-tag-id
+                                     :value '())
+                           (nbt-list :name "list name"
+                                     :elements-type byte-tag-id
+                                     :value '())))
+        (expect (nbt-equal (nbt-list :name "list name"
+                                     :elements-type byte-tag-id
+                                     :value (list
+                                             (nbt-byte :name "a" :value 12)
+                                             (nbt-byte :name "a" :value 13)
+                                             (nbt-byte :name "a" :value 14)))
+                           (nbt-list :name "list name"
+                                     :elements-type byte-tag-id
+                                     :value (list
+                                             (nbt-byte :name "a" :value 12)
+                                             (nbt-byte :name "a" :value 13)
+                                             (nbt-byte :name "a" :value 14))))))
+      (it "is not equal to a list with same values but different names"
+        (expect (nbt-equal (nbt-list :name "list name"
+                                     :elements-type byte-tag-id
+                                     :value '())
+                           (nbt-list :name "list name a"
+                                     :elements-type byte-tag-id
+                                     :value '()))
+                :to-be nil)
+        (expect (nbt-equal (nbt-list :name "list name b"
+                                     :elements-type byte-tag-id
+                                     :value (list
+                                             (nbt-byte :name "a" :value 12)
+                                             (nbt-byte :name "a" :value 13)
+                                             (nbt-byte :name "a" :value 14)))
+                           (nbt-list :name "list name a b"
+                                     :elements-type byte-tag-id
+                                     :value (list
+                                             (nbt-byte :name "a" :value 12)
+                                             (nbt-byte :name "a" :value 13)
+                                             (nbt-byte :name "a" :value 14))))
+                :to-be nil))
+      (it "is not equal to a list with same names but different values"
+        (expect (nbt-equal (nbt-list :name "list name"
+                                     :elements-type byte-tag-id
+                                     :value '())
+                           (nbt-list :name "list name a"
+                                     :elements-type byte-tag-id
+                                     :value (list (nbt-byte :name "b" :value 44))))
+                :to-be nil)
+        (expect (nbt-equal (nbt-list :name "list name"
+                                     :elements-type byte-tag-id
+                                     :value (list
+                                             (nbt-byte :name "a" :value 12)
+                                             (nbt-byte :name "a" :value 13)
+                                             (nbt-byte :name "a" :value 14)))
+                           (nbt-list :name "list name"
+                                     :elements-type byte-tag-id
+                                     :value (list
+                                             (nbt-byte :name "a" :value 12)
+                                             (nbt-byte :name "a" :value 13)
+                                             (nbt-byte :name "a" :value 14)
+                                             (nbt-byte :name "a" :value 15))))
+                :to-be nil)
+        (expect (nbt-equal (nbt-list :name "list name"
+                                     :elements-type byte-tag-id
+                                     :value (list
+                                             (nbt-byte :name "a" :value 12)
+                                             (nbt-byte :name "b" :value 13)
+                                             (nbt-byte :name "a" :value 14)))
+                           (nbt-list :name "list name"
+                                     :elements-type byte-tag-id
+                                     :value (list
+                                             (nbt-byte :name "a" :value 12)
+                                             (nbt-byte :name "a" :value 13)
+                                             (nbt-byte :name "a" :value 14))))
                 :to-be nil)))))
 
-
-;;; TODO/FIXME equality tests/implementation for lists, compounds etc
