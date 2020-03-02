@@ -26,7 +26,6 @@
 
 (defclass nbt-named-tag (nbt-tag)
   ((name :initarg :name
-         :type string
          :documentation "tag name"))
   :abstract t)
 
@@ -214,7 +213,7 @@
          (length (nbt/read-int)))
     (nbt-list :name name
               :elements-type items-type
-              :value (--map (nbt/create-tag-from-id items-type (lambda () ""))
+              :value (--map (nbt/create-tag-from-id items-type (lambda () nil))
                             (number-sequence 1 length)))))
 
 (defmethod nbt-equal ((this nbt-list) that)
