@@ -46,4 +46,16 @@
     (goto-char (+ string-length (point)))
     string-content))
 
+;;; TODO/FIXME test
+(defun nbt/read-data (spec)
+  (let* ((size (bindat-length spec '()))
+         (start (point))
+         (end (+ start size)))
+    (bindat-unpack spec (buffer-substring-no-properties start end))))
+
+;;; TODO/FIXME test
+(defun nbt/read-raw-chunk (spec)
+  "Read a chunk of header"
+  (cdar (nbt/read-data spec)))
+
 (provide 'nbt-data)
