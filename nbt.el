@@ -1,18 +1,10 @@
 (require 'cl)
 (require 'bindat)
+(require 'nbt-utils)
 (require 'nbt-objects)
 
 ;;; Those two bytes identify zlib files
 (defconst nbt-zlib-magic-bytes '(#x1f #x8b))
-
-(defmacro nbt/with-configured-buffer (path &rest forms)
-  (declare (indent defun)
-           (debug t))
-  `(with-temp-buffer
-     (toggle-enable-multibyte-characters nil)
-     (insert-file-contents-literally ,path)
-     (goto-char (point-min))
-     ,@forms))
 
 (defun nbt/read-uncompressed-file (path)
   (nbt/with-configured-buffer path
