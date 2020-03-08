@@ -9,9 +9,17 @@
               :to-equal '(23 . -34)))
     (it "returns the correct numbers for absolute paths"
       (expect (mcr/parse-file-name "/a/b/c/d/r.-23.0.mcr")
+              :to-equal '(-23 . 0))
+      (expect (mcr/parse-file-name "c:\\a\\b\\c\\r.-23.0.mcr")
               :to-equal '(-23 . 0)))
     (it "throws error if the file is not compliant"
-      (expect (mcr/parse-file-name "r.23.2.mcg") :to-throw 'error)))
+      (expect (mcr/parse-file-name "r.23.2.mcg") :to-throw 'error)
+      (expect (mcr/parse-file-name "r.a23.2.mcr") :to-throw 'error)
+      (expect (mcr/parse-file-name "r.23a.2.mcr") :to-throw 'error)
+      (expect (mcr/parse-file-name "r.23.2.3.mcr") :to-throw 'error)
+      (expect (mcr/parse-file-name "r.23.2.a.mcr") :to-throw 'error)
+      (expect (mcr/parse-file-name "ar.23.2.mcr") :to-throw 'error)
+      (expect (mcr/parse-file-name "rx23x2xmcr") :to-throw 'error)))
   (describe "mcr/region-bound-chunks"
     (it "returns the expected values"
       (expect (mcr/region-bound-chunks 3)
