@@ -30,6 +30,17 @@
     (it "returns the expected values"
       (expect (mcr/compute-chunk-range 3 -1)
               :to-equal '((96 . 127) . (-32 . -1)))))
+  (describe "mcr/region-for-chunk"
+    (it "returns the correct result for positive chunks"
+      (expect (mcr/region-for-chunk 23) :to-be 0)
+      (expect (mcr/region-for-chunk 32) :to-be 1)
+      (expect (mcr/region-for-chunk 33) :to-be 1)
+      (expect (mcr/region-for-chunk 64) :to-be 2))
+    (it "returns the correct result for positive chunks"
+      (expect (mcr/region-for-chunk -1) :to-be -1)
+      (expect (mcr/region-for-chunk -32) :to-be -1)
+      (expect (mcr/region-for-chunk -33) :to-be -2)
+      (expect (mcr/region-for-chunk -64) :to-be -2)))
   (describe "mcr/read-file"
     (it "can read an mcr file without crashing"
       (expect (mcr/read-file "test-data/r.0.0.mca")

@@ -14,6 +14,10 @@
   (cons (mcr/region-bound-chunks x)
         (mcr/region-bound-chunks z)))
 
+(defun mcr/region-for-chunk (c)
+  (floor (/ (float c)
+            chunks-per-region)))
+
 (defun mcr/file--name-indices (path)
   (save-match-data
     (with-temp-buffer
@@ -32,6 +36,7 @@
 (defun mcr/read-file (path)
   (nbt/with-file path
     (let ((all-entries (mcr/read-header)))
+      (--each all-entries (message "%s" it))
       (mcr/read-chunk (car all-entries)))))
 
 (provide 'mcr)

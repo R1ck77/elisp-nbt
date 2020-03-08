@@ -16,6 +16,7 @@
   (present-p (oref this location)))
 
 (defmethod get-buffer-location ((this mcr-header-entry))
+  "Returns the location in the buffer (1-based coordinate)"
   (1+ (oref (oref this location) offset)))
 
 
