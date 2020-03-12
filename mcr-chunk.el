@@ -1,3 +1,5 @@
+(require 'nbt)
+
 ;;; TODO/FIXME use an EIEIO object
 (defconst chunk-header '((length long) (compression byte)))
 
@@ -13,23 +15,20 @@
     (write-file "/tmp/emacs-mytest")
     (delete-char 5)
     (write-file "/tmp/emacs-after-deletion")
-    (assert (zlib-decompress-region (point-min) (point-max)) nil "WHOPSIE!"))) ;;; TODO/FIXME this is ok
+    (assert (zlib-decompress-region (point-min) (point-max)) nil "WHOPSIE!")))
 
 (defun mcr/read-chunk (header-entry)
   (debug-sample-substring)  
   (message "current chunk: %s" header-entry)
-  (mcr/safe-seek 8193) ;; 8192 [5:] in python, that is 8192 + 6 in emacs
+  (mcr/safe-seek 8193) ;; 8192 [5:] in python, that is 8192 + 6 in emacs  
   (let ((chunk-header-content (nbt/read-data chunk-header)))
+    (assert (= (point) 8198) t "Wrong position?")
     (assert (= 2 (cdr (assq 'compression chunk-header-content))))
     (let* ((length (cdr (assq 'length chunk-header-content))))
-      (nbt/with-raw-data (buffer-substring-no-properties (+ (point) 6) (1- (+ (point) length)))
+      (nbt/with-raw-data (buffer-substring-no-properties (point) (1- (+ (point) length)))
         (message "Size: %s" (- (point-max) (point-min)))
         (write-file "/tmp/something.gz")
         (assert (zlib-decompress-region (point-min) (point-max)))
-       
-        ))
-    ;;; TODO/FIXME hic sunt leones. I can't get to uncompress the data
-    ))
-
-
+        (message "Result: %s" (nbt/read-all-raw-tags))))))
+    
 (provide 'mcr-chunk)
