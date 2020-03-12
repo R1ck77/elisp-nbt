@@ -12,9 +12,11 @@
    (timestamp :initarg :timestamp
               :initvalue nil)))
 
+;;; TODO/FIXME name!
 (defmethod present-p ((this mcr-header-entry))
   (present-p (oref this location)))
 
+;;; TODO/FIXME name!
 (defmethod get-buffer-location ((this mcr-header-entry))
   "Returns the location in the buffer (1-based coordinate)"
   (1+ (oref (oref this location) offset)))

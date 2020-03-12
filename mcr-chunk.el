@@ -6,13 +6,14 @@
   (assert (= (point) position)))
 
 (defun debug-sample-substring ()
+  "This works."
   (goto-char 8193)
   (assert (= (point) 8193))
   (nbt/with-raw-data (buffer-substring-no-properties (point) (+ 8192 (point)))
     (write-file "/tmp/emacs-mytest")
     (delete-char 5)
     (write-file "/tmp/emacs-after-deletion")
-    (assert (zlib-decompress-region (point-min) (point-max))))) ;;; TODO/FIXME this is ok
+    (assert (zlib-decompress-region (point-min) (point-max)) nil "WHOPSIE!"))) ;;; TODO/FIXME this is ok
 
 (defun mcr/read-chunk (header-entry)
   (debug-sample-substring)  
