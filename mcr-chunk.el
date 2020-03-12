@@ -1,4 +1,5 @@
 (require 'nbt)
+(require 'nbt-utils)
 
 ;;; TODO/FIXME use an EIEIO object
 (defconst chunk-header '((length long) (compression byte)))

@@ -36,10 +36,8 @@
 (defun mcr/read-file (path)
   (nbt/with-file path
     (let* ((all-entries (mcr/read-header))
-          (selected-one (--filter (= (get-buffer-location it) 8193) all-entries )))
-      (assert (= 1 (length selected-one)))
-      (--each all-entries (message "%s" it))
-     
-      (mcr/read-chunk (car selected-one)))))
+          (selected-one (elt all-entries (cl-random (length all-entries)))))
+      (--each all-entries (message "%s" it))     
+      (mcr/read-chunk selected-one))))
 
 (provide 'mcr)
