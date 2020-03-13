@@ -38,8 +38,7 @@
 
 (defclass nbt-valued-tag (nbt-named-tag)
   ((value :initarg :value
-          :documentation "the tag content")
-   (equality :initvalue #'=))
+          :documentation "the tag content"))
   :abstract t)
 
 (defmethod nbt-value ((this nbt-valued-tag))
