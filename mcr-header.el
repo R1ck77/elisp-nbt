@@ -16,21 +16,35 @@
 (defmethod present-p ((this mcr-header-entry))
   (present-p (oref this location)))
 
+(defmethod mcr/entry-byte ((this mcr-header-entry))
+  (oref (oref this location) byte))
+
 ;;; TODO/FIXME name!
 (defmethod get-buffer-location ((this mcr-header-entry))
   "Returns the location in the buffer (1-based coordinate)"
   (1+ (oref (oref this location) offset)))
 
+(defun mcr/read--headers ()
+  "Read the first 8192 bytes of the minecraft header"
+  (--zip-with (mcr-header-entry :location it
+                                :timestamp other)
+              (mcr/read--locations)
+              (mcr/read--timestamps)))
 
-;;; TODO/FIXME remove the let, used only for debugging
-(defun mcr/read-header ()
-  "Read the first 8192 bytes of minecraft header, filtering missing sectors"
-  (let ((result (--filter (present-p it)
-                          (--zip-with (mcr-header-entry :location it
-                                                           :timestamp other)
-                                         (mcr/read--locations)
-                                         (mcr/read--timestamps)))))
-    result))
+(defun mcr/filtered--headers ()
+  "Return the list of offset/timestamp entries that are not empty"
+  (--filter (present-p it) (mcr/read--headers)))
+
+(defun mcr/read-header-map ()
+  "Return a hash table with all the headers"
+  (let ((table (make-hash-table)))    
+    (--each (mcr/filtered--headers)
+      (puthash (mcr/entry-byte it) it table))
+    table))
+
+(defun mcr/read-header-table ()
+  "Read the first 8192 bytes of minecraft header, return an hash-table"
+  (mcr/read-header-map)) ;;TODO/FIXME overkill
 
 
 (provide 'mcr-header)
