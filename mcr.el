@@ -33,11 +33,21 @@
     (cons (string-to-number (car indices))
           (string-to-number (cdr indices)))))
 
-(defun mcr/read-file (path)
+(defclass mcr-region ()
+  ((header :initarg :header)
+   (buffer :initarg :buffer)
+   (x :initarg :x)
+   (y :initarg :y))
+  "Region with on-demand chunk data decompression")
+
+(defun mcr/read--file (path)
   (nbt/with-file path
     (let* ((all-entries (mcr/read-header))
           (selected-one (elt all-entries (cl-random (length all-entries)))))
       (--each all-entries (message "%s" it))     
       (mcr/read-chunk selected-one))))
+
+(defmethod mcr/read-file ((class (subclass mcr-region)) path)
+  (mcr-region ))
 
 (provide 'mcr)
