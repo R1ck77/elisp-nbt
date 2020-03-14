@@ -36,18 +36,22 @@
 (defclass mcr-region ()
   ((header :initarg :header)
    (buffer :initarg :buffer)
-   (x :initarg :x)
-   (y :initarg :y))
+   (path :initarg :path))
   "Region with on-demand chunk data decompression")
 
-(defun mcr/read--file (path)
-  (nbt/with-file path
-    (let* ((all-entries (mcr/read-header))
-          (selected-one (elt all-entries (cl-random (length all-entries)))))
-      (--each all-entries (message "%s" it))     
-      (mcr/read-chunk selected-one))))
-
 (defmethod mcr/read-file ((class (subclass mcr-region)) path)
-  (mcr-region ))
+  (let ((buffer (nbt/load-data "TEMP_BUFFER" path)))
+    (with-current-buffer buffer
+      (mcr-region :header (mcr/read-header)
+                  :buffer buffer
+                  :path path))))
+
+(defun mcr/demo-something (path)
+  (let* ((region (mcr/read-file mcr-region path))
+         (selected-one (nbt/random-element (oref region header))))
+    (--each (oref region header) (message "%s" it))
+    (with-current-buffer (oref region buffer)
+     (mcr/read-chunk selected-one))))
+
 
 (provide 'mcr)
