@@ -51,12 +51,15 @@
         (* 32 (logand z 31)))
      4))
 
+(defmacro comment (&rest forms))
+
 (defmethod mcr/get-chunk ((this mcr-region) x z)
   (let* ((region this)
          (selected-header-entry (gethash (header-offset x z) (oref region header-table))))
-    (maphash (lambda (k v)
-               (message "%s -> %s" k v))
-             (oref region header-table))
+    (message "Entry: %s" selected-header-entry)
+    (comment (maphash (lambda (k v)
+                        (message "%s -> %s" k v))
+                      (oref region header-table)))
     (with-current-buffer (oref region buffer)
       (mcr/read-chunk selected-header-entry))))
 

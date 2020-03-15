@@ -30,6 +30,6 @@
         (message "Size: %s" (- (point-max) (point-min)))
         (write-file "/tmp/something.gz")
         (assert (zlib-decompress-region (point-min) (point-max)))
-        (message "Result: %s" (nbt/read-all-raw-tags))))))
+        (nbt/read-all-raw-tags)))))
     
 (provide 'mcr-chunk)
