@@ -202,6 +202,7 @@
 (defmethod nbt-subtag-names ((this nbt-compound))
   (--map (oref it name) (oref this value)))
 
+;;; add a threading (-->/->) macro of sorts
 (defmethod nbt-get ((this nbt-compound) name)
   (car (--filter (equal name (oref it name)) (oref this value))))
 
