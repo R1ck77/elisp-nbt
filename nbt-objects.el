@@ -199,6 +199,12 @@
               (= (length this-tags) (length that-tags))
               (nbt/compare--tags this-tags that-tags)))))
 
+(defmethod nbt-subtag-names ((this nbt-compound))
+  (--map (oref it name) (oref this value)))
+
+(defmethod nbt-get ((this nbt-compound) name)
+  (car (--filter (equal name (oref it name)) (oref this value))))
+
 (defclass nbt-list (nbt-valued-tag)
   ((elements-type :initarg :elements-type))
   "List of unnamed tags")
