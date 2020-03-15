@@ -53,6 +53,7 @@
 
 (defmacro comment (&rest forms))
 
+;;; TODO/FIXME weird things when executed interactively (killing buffers? Strange…)
 (defmethod mcr/get-chunk ((this mcr-region) x z)
   (let* ((region this)
          (selected-header-entry (gethash (header-offset x z) (oref region header-table))))
